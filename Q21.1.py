@@ -74,5 +74,41 @@ def _(df, np):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    [2]について
+    """)
+    return
+
+
+@app.cell
+def _(df, io, pd):
+    table_sample_size = """
+    n_1  n_2  n_3  n_4
+    2     2    2    2
+    4     2    1    1
+    1     2    4    1
+    """
+    df_sample_size = pd.read_csv(io.StringIO(table_sample_size.strip()), sep='\s+')
+    print(df_sample_size)
+    # 1. サンプルサイズテーブルの1行目（インデックス1）を取得
+    # .values を使うことで、カラム名を無視して純粋な数値のリストとして扱えます
+    sample_size_temp = df_sample_size.loc[1].values
+    df["サンプルサイズ"] = sample_size_temp
+    print(df)
+    return (df_sample_size,)
+
+
+@app.cell
+def _(df, df_sample_size):
+    #サンプル総数値(母総数値の推定値)の計算
+    for index ,row in df_sample_size.iterrows():
+        df["サンプルサイズ"] = row.values
+        #print(df)
+        print(((df["層の大きさ"] ** 2) * ((df["層の大きさ"]-df["サンプルサイズ"])/(df["層の大きさ"]-1)) * ((1/df["サンプルサイズ"])*(df["層内標準偏差"]**2))).sum())
+    return
+
+
 if __name__ == "__main__":
     app.run()

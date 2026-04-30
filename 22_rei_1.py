@@ -21,7 +21,7 @@ def _():
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    P194の例1
+    このノートは、P194の例1と、P197の例2を載せている。
     """)
     return
 
@@ -384,18 +384,18 @@ def _(df_test_data, np, pca, pd):
     def run_principal_component_loading(pca):
         # 1. 固有値の平方根（標準偏差）を求める
         eigen_stds = np.sqrt(pca.explained_variance_)
-    
+
         # 2. 固有ベクトルに固有値の平方根を掛ける
         # pca.components_ (固有ベクトル) の各行に、対応する標準偏差を掛ける
         loadings = pca.components_.T * eigen_stds
-    
+
         # 3. データフレーム化
         loadings_df = pd.DataFrame(
             loadings,
             index=df_test_data.columns,
             columns=[f"第{i+1}主成分負荷量" for i in range(len(eigen_stds))]
         )
-    
+
         print("主成分負荷量の表:")
         #print(loadings_df)
         print(loadings_df.T)
@@ -411,10 +411,10 @@ def _(PCA, StandardScaler, df_test_data, np):
         # 標準化したデータでのPCAをやり直す
         scaler = StandardScaler()
         std_data = scaler.fit_transform(df_test_data)
-    
+
         pca_std = PCA()
         pca_std.fit(std_data)
-    
+
         # 標準化ベースの主成分負荷量を計算
         std_loadings = pca_std.components_.T * np.sqrt(pca_std.explained_variance_)
         print(std_loadings)
@@ -439,14 +439,14 @@ def _(df_test_data, np, pca, pd):
         stds = df_test_data.std(ddof=0)
         # 不偏標準偏差を求める
         stds = df_sub.std(ddof=1)
-    
+
         # 2. 固有値の平方根を取得
         eigen_stds = np.sqrt(pca.explained_variance_)
-    
+
         # 3. 主成分負荷量の計算
         # (固有ベクトル * √固有値) / (元の変数の標準偏差)
         loadings = (pca.components_.T * eigen_stds) / stds.values.reshape(-1, 1)
-    
+
         # データフレームで表示（第1列が第1主成分負荷量）
         loadings_df = pd.DataFrame(
             loadings,
@@ -458,7 +458,6 @@ def _(df_test_data, np, pca, pd):
 
     run_principal_component_loading3()
     #まだ教科書の表の数値とは乖離があるんだよな。。。
-
     return
 
 
@@ -467,14 +466,14 @@ def _(df_test_data, np, pd):
     def solve_textbook_loadings():
         # 1. データの準備（6行すべて使用）
         data = df_test_data 
-    
+
         # 2. 分散共分散行列を「不偏分散(ddof=1)」で作成
         # np.covのデフォルトは ddof=1 ですが、明示します
         cov_matrix = np.cov(data.T, ddof=1)
 
         # 3. 固有値・固有ベクトルの算出
         eigen_values, eigen_vectors = np.linalg.eigh(cov_matrix)
-    
+
         # 降順ソート
         idx = eigen_values.argsort()[::-1]
         evals = eigen_values[idx]
@@ -495,7 +494,7 @@ def _(df_test_data, np, pd):
             index=data.columns,
             columns=[f"第{i+1}主成分負荷量" for i in range(len(evals))]
         )
-    
+
         print("固有値 (教科書の20.2, 19.4... と一致):")
         print(evals)
         print("\n主成分負荷量の表 (x_1の第1主成分が0.551になるはず):")
@@ -503,7 +502,6 @@ def _(df_test_data, np, pd):
         print(loadings_df.T)
 
     solve_textbook_loadings()
-
     return
 
 
